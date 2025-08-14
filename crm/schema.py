@@ -4,12 +4,14 @@ from decimal import Decimal
 import graphene
 from graphene import Field, List
 from graphene_django import DjangoObjectType
+from graphene_django.filter import DjangoFilterConnectionField
 from django.db import transaction, IntegrityError
 from django.utils import timezone
 from datetime import datetime
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from .models import Customer, Product, Order
+from .filters import CustomerFilter, ProductFilter, OrderFilter
 
 # ------------------------
 # GraphQL Types
