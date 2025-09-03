@@ -12,6 +12,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from .models import Customer, Product, Order
 from .filters import CustomerFilter, ProductFilter, OrderFilter
+from crm.models import Product"
 
 # ------------------------
 # GraphQL Types
