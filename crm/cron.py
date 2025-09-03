@@ -1,47 +1,33 @@
 import datetime
-import requests
+import asyncio
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
+
 
 def log_crm_heartbeat():
     now = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
     message = f"{now} CRM is alive\n"
+
     with open("/tmp/crm_heartbeat_log.txt", "a") as log_file:
         log_file.write(message)
 
-        # Optional GraphQL hello query
+        # Run optional GraphQL hello query
         try:
-            response = requests.post(
-                "http://localhost:8000/graphql",
-                json={"query": "{ hello }"},
-                timeout=5
-            )
-            if response.status_code == 200:
-                log_file.write(f"{now} GraphQL hello response: {response.json()}\n")
-            else:
-                log_file.write(f"{now} GraphQL endpoint error: {response.status_code}\n")
+            asyncio.run(query_graphql_hello(log_file, now))
         except Exception as e:
             log_file.write(f"{now} GraphQL check failed: {e}\n")
 
 
-import datetime
-import requests
+async def query_graphql_hello(log_file, now):
+    transport = RequestsHTTPTransport(
+        url="http://localhost:8000/graphql",
+        verify=True,
+        retries=3,
+    )
+    client = Client(transport=transport, fetch_schema_from_transport=True)
 
-def log_crm_heartbeat():
-    now = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
-    message = f"{now} CRM is alive\n"
-    with open("/tmp/crm_heartbeat_log.txt", "a") as log_file:
-        log_file.write(message)
+    query = gql("{ hello }")
+    result = await client.execute_async(query)
 
-        # Optional GraphQL hello query
-        try:
-            response = requests.post(
-                "http://localhost:8000/graphql",
-                json={"query": "{ hello }"},
-                timeout=5
-            )
-            if response.status_code == 200:
-                log_file.write(f"{now} GraphQL hello response: {response.json()}\n")
-            else:
-                log_file.write(f"{now} GraphQL endpoint error: {response.status_code}\n")
-        except Exception as e:
-            log_file.write(f"{now} GraphQL check failed: {e}\n")
+    log_file.write(f"{now} GraphQL hello response: {result}\n")
 
