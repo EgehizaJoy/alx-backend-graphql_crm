@@ -3,6 +3,8 @@ import asyncio
 from celery import shared_task
 from gql import gql, Client
 from gql.transport.requests import RequestsHTTPTransport
+from datetime import datetime
+import requests
 
 
 @shared_task
