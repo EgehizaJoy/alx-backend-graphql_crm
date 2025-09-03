@@ -31,3 +31,15 @@ async def query_graphql_hello(log_file, now):
 
     log_file.write(f"{now} GraphQL hello response: {result}\n")
 
+def update_low_stock():
+    now = datetime.datetime.now().strftime("%d/%m/%Y-%H:%M:%S")
+    with open("/tmp/low_stock_updates_log.txt", "a") as log_file:
+        try:
+            result = asyncio.run(run_update_mutation())
+            products = result.get("updateLowStockProducts", {}).get("products", [])
+            for product in products:
+                log_file.write(
+                    f"{now} - Updated {product['name']} to stock {product['stock']}\n"
+                )
+        except Exception as e:
+            log_file.write(f"{now} - Error updating low stock: {e}\n")
